@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ус Ундрах ХХК — Гүний худгийн өрөмдлөг, усны хайгуул</title>
+<meta name="description" content="Ус Ундрах ХХК — 2001 оноос хойш Монгол орны хөдөө орон нутагт 500 гаруй гүний худаг өрөмдсөн. Усны хайгуул, гүний худгийн өрөмдлөг, усны барилга байгууламжийн мэргэжлийн үйлчилгээ. 3D туршлага." />
+<meta property="og:title" content="Ус Ундрах ХХК — Газрын гүнээс амьд ус ундраана" />
+<meta property="og:description" content="Гүний худгийн өрөмдлөгийн технологиор улсдаа тэргүүлэгч. 2001 оноос хойш 500+ худаг." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans:wght@400;600&display=swap" rel="stylesheet" />
+<link rel="icon" href="assets/logo.svg" />
+<link rel="stylesheet" href="styles.css" />
+<script type="importmap">
+{ "imports": {
+  "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+}}
+</script>
+</head>
+<body>
+
+<!-- WebGL descent scene (decorative, fixed behind content) -->
+<canvas id="scene" aria-hidden="true"></canvas>
+<div class="scene-fallback" aria-hidden="true"></div>
+<div class="vignette" aria-hidden="true"></div>
+
+<!-- loading overlay -->
+<div class="loader" id="loader" aria-hidden="true">
+  <div class="loader__mark"><span></span><span></span><span></span></div>
+  <div class="loader__txt">Цооногийг өрөмдөж байна…</div>
+</div>
+
+<!-- depth HUD (signature) -->
+<aside class="hud" id="hud" aria-hidden="true">
+  <div class="hud__label">Гүн</div>
+  <div class="hud__val"><span id="hudDepth">0</span><span class="hud__u">м</span></div>
+  <div class="hud__rail"><div class="hud__fill" id="hudFill"></div></div>
+  <div class="hud__strata" id="hudStrata">Газрын гадарга</div>
+</aside>
+<div class="mprog" aria-hidden="true"><div class="mprog__fill" id="mFill"></div><div class="mprog__read" id="mRead">0м</div></div>
+
+<!-- header -->
+<header class="hd" id="hd">
+  <div class="hd__in">
+    <a class="brand" href="#top" aria-label="Ус Ундрах ХХК — нүүр">
+      <span class="brand__mark" aria-hidden="true">
+        <svg width="40" height="40" viewBox="50 20 200 200" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="hGold" cx="50%" cy="35%" r="65%"><stop offset="0%" stop-color="#F5D97A"/><stop offset="40%" stop-color="#C9A227"/><stop offset="75%" stop-color="#A07818"/><stop offset="100%" stop-color="#D4A830"/></radialGradient>
+            <linearGradient id="hDropG" x1="25%" y1="10%" x2="75%" y2="100%"><stop offset="0%" stop-color="#A8DFF5"/><stop offset="35%" stop-color="#4AAFE0"/><stop offset="100%" stop-color="#1A6FA8"/></linearGradient>
+            <radialGradient id="hDotG" cx="38%" cy="30%" r="60%"><stop offset="0%" stop-color="#A8DFF5"/><stop offset="50%" stop-color="#4AAFE0"/><stop offset="100%" stop-color="#1A6FA8"/></radialGradient>
+            <radialGradient id="hShine" cx="35%" cy="25%" r="40%"><stop offset="0%" stop-color="white" stop-opacity="0.85"/><stop offset="100%" stop-color="white" stop-opacity="0"/></radialGradient>
+            <path id="hDrop" d="M0,-26 C0,-26 -17,0 -17,14 C-17,23.5 -9.5,31 0,31 C9.5,31 17,23.5 17,14 C17,0 0,-26 0,-26 Z"/>
+          </defs>
+          <g transform="translate(150,52)"><use href="#hDrop" fill="url(#hDropG)"/><use href="#hDrop" fill="url(#hShine)"/></g>
+          <g transform="translate(208.9,86) rotate(60)"><use href="#hDrop" fill="url(#hDropG)"/><use href="#hDrop" fill="url(#hShine)"/></g>
+          <g transform="translate(208.9,154) rotate(120)"><use href="#hDrop" fill="url(#hDropG)"/><use href="#hDrop" fill="url(#hShine)"/></g>
+          <g transform="translate(150,188) rotate(180)"><use href="#hDrop" fill="url(#hDropG)"/><use href="#hDrop" fill="url(#hShine)"/></g>
+          <g transform="translate(91.1,154) rotate(240)"><use href="#hDrop" fill="url(#hDropG)"/><use href="#hDrop" fill="url(#hShine)"/></g>
+          <g transform="translate(91.1,86) rotate(300)"><use href="#hDrop" fill="url(#hDropG)"/><use href="#hDrop" fill="url(#hShine)"/></g>
+          <circle cx="150" cy="120" r="21" fill="none" stroke="url(#hGold)" stroke-width="5"/>
+          <circle cx="150" cy="120" r="16" fill="url(#hDotG)"/>
+          <ellipse cx="144" cy="113" rx="6" ry="7" fill="white" opacity="0.5" transform="rotate(-15,144,113)"/>
+        </svg>
+      </span>
+      <span class="brand__txt"><span class="brand__name">Ус Ундрах</span><span class="brand__sub">ХХК · 2001</span></span>
+    </a>
+    <nav class="nav" aria-label="Үндсэн цэс">
+      <a href="#about">Бидний тухай</a>
+      <a href="#services">Үйлчилгээ</a>
+      <a href="#tech">Технологи</a>
+      <a href="#capacity">Хүчин чадал</a>
+      <a href="#projects">Төслүүд</a>
+      <a href="#contact" class="nav__cta">Холбоо барих</a>
+    </nav>
+    <button class="burger" id="burger" aria-label="Цэс нээх" aria-expanded="false"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<div class="mpanel" id="mpanel">
+  <a href="#about">Бидний тухай</a>
+  <a href="#services">Үйлчилгээ</a>
+  <a href="#tech">Технологи</a>
+  <a href="#capacity">Хүчин чадал</a>
+  <a href="#history">Түүхэн замнал</a>
+  <a href="#projects">Төслүүд</a>
+  <a href="#team">Баг хамт олон</a>
+  <a href="#contact">Холбоо барих</a>
+</div>
+
+<main>
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="hero__in">
+    <span class="hero__tag"><span class="pulse"></span>Усны хайгуул · Гүний өрөмдлөг · Усны байгууламж</span>
+    <h1 class="hero__h1">Газрын гүнээс<br><span class="accent">амьд ус</span> ундраана</h1>
+    <p class="hero__sub">2001 оноос хойш Монгол орны хээр тал, говь, хангайн аль ч хөрсөнд найдвартай гүний худаг өрөмдөж байна. Доош гүйлгэн, газрын гүн рүү аялаарай.</p>
+    <div class="hero__act">
+      <a href="#contact" class="btn btn--pri">Худаг захиалах <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      <a href="#services" class="btn btn--ghost">Үйлчилгээ үзэх</a>
+    </div>
+  </div>
+  <div class="hero__stats">
+    <div class="hstat"><b>500+</b><span>Өрөмдсөн худаг</span></div>
+    <div class="hstat"><b>250<i>м</i></b><span>Хүртэлх гүн</span></div>
+    <div class="hstat"><b>24<i>жил</i></b><span>Туршлага</span></div>
+  </div>
+  <div class="scrollcue"><span>Доош уруудах</span><span class="scrollcue__bar"></span></div>
+</section>
+
+<!-- ABOUT -->
+<section class="section" id="about" data-depth="20" data-strata="Өнгөн хөрс">
+  <div class="wrap">
+    <div class="eyebrow"><span>01</span> Бидний тухай</div>
+    <div class="about">
+      <div class="panel about__copy reveal">
+        <h2 class="h-sec">Усыг олж, улсынхаа<br>хөгжилд зориулдаг</h2>
+        <p class="lead">Ус Ундрах ХХК нь 2001 онд үүсэн байгуулагдсан цагаасаа хойш усны хайгуул судалгаа болон газрын гүний олон янзын нөхцөлд 50–250 метр хүртэлх гүнтэй худаг өрөмдсөн баялаг туршлагатай.</p>
+        <p class="muted">Ундны, газар тариалан, уул уурхай, үйлдвэрлэлийн гээд бүх төрлийн зориулалтаар баталгаат гүний худаг өрөмдөнө. Хийж буй ажилдаа чин сэтгэлээсээ, шинжлэх ухаанчаар хандаж, байгальд ээлтэй үйл ажиллагаа явуулдаг.</p>
+        <div class="pillars">
+          <div class="pillar"><span class="pillar__k">Эрхэм зорилго</span><b>Чандмань эрдэнэ ус</b><span class="pillar__d">Усыг улс эх орныхоо хөгжил, цэцэглэлтийн төлөөх үйлсэд зориулна.</span></div>
+          <div class="pillar"><span class="pillar__k">Алсын хараа</span><b>Технологиор тэргүүлнэ</b><span class="pillar__d">Гүний худгийн технологиор улсдаа тэргүүлж, дэвшлийг нутагшуулна.</span></div>
+          <div class="pillar"><span class="pillar__k">Үнэт зүйл</span><b>Шинжлэх ухаанч</b><span class="pillar__d">Хэрэглэгчид нийцсэн, байгальд ээлтэй, баталгаат чанар.</span></div>
+        </div>
+      </div>
+      <figure class="about__media reveal" data-d="1">
+        <img src="assets/about.jpg" alt="Ус Ундрах ХХК-ийн гүний худгийн өрөмдлөгийн ажиллагаа хээр талд" loading="lazy" />
+        <figcaption><b>2001</b><span>оноос хойш<br>тасралтгүй</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="section" id="services" data-depth="60" data-strata="Элсэн үе">
+  <div class="wrap">
+    <div class="eyebrow"><span>02</span> Үндсэн үйлчилгээ</div>
+    <h2 class="h-sec center reveal">Усны эх үүсвэрийн бүрэн шийдэл</h2>
+    <p class="lead center reveal">Хайгуулаас эхлээд өрөмдлөг, усны барилга байгууламж хүртэл — эхнээс нь дуустал нь.</p>
+    <div class="svc">
+      <article class="panel card reveal">
+        <div class="card__img"><img src="assets/svc-survey.jpg" alt="Усны хайгуул судалгаа" loading="lazy" /></div>
+        <div class="card__no">01 — Хайгуул</div>
+        <h3 class="card__t">Усны хайгуул, судалгаа</h3>
+        <p class="card__d">600 метр хүртэлх гүнд усны хайгуул судалгаа явуулж, хөрсний үзүүлэлтийг тодорхойлно. Тохирох технологийг оновчтой сонгоно.</p>
+        <ul class="card__list"><li>Газрын доорхи усны нөөцийн судалгаа</li><li>Хөрс, чулуулгийн үзүүлэлт тодорхойлолт</li><li>Цооногийн байршил, гүний тооцоо</li></ul>
+      </article>
+      <article class="panel card reveal" data-d="1">
+        <div class="card__img"><img src="assets/svc-drill.jpg" alt="Гүний худгийн өрөмдлөг" loading="lazy" /></div>
+        <div class="card__no">02 — Өрөмдлөг</div>
+        <h3 class="card__t">Гүний худгийн өрөмдлөг</h3>
+        <p class="card__d">Бүх төрлийн хөрсөнд гүний худаг өрөмдөх чадвартай мэргэжлийн баг, тоног төхөөрөмжтэй. Цооногийг өрөмдөж, тоноглож, сэргээн засварлана.</p>
+        <ul class="card__list"><li>Цооног өрөмдөх, бэхэлгээ хийх</li><li>Насос суурилуулж тоноглох</li><li>Хуучин худаг сэргээн засварлах</li></ul>
+      </article>
+      <article class="panel card reveal" data-d="2">
+        <div class="card__img"><img src="assets/svc-structure.jpg" alt="Усны барилга байгууламж" loading="lazy" /></div>
+        <div class="card__no">03 — Байгууламж</div>
+        <h3 class="card__t">Усны барилга байгууламж</h3>
+        <p class="card__d">Захиалагчийн хүсэлд нийцүүлэн усны барилга байгууламжийг олон төрлийн сонголтоор шийдвэрлэнэ. Нарны эрчим хүчээр тэжээх боломжтой.</p>
+        <ul class="card__list"><li>Усан сан, нөөцийн байгууламж</li><li>Нарны эх үүсвэрийн цахилгаан</li><li>Барих, сэргээн засварлах, шинэчлэх</li></ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- TECHNOLOGY -->
+<section class="section" id="tech" data-depth="110" data-strata="Чулуулаг үе">
+  <div class="wrap">
+    <div class="eyebrow"><span>03</span> Өрөмдлөгийн технологи</div>
+    <h2 class="h-sec reveal">Хөрсөнд тохирсон зөв технологи</h2>
+    <p class="lead reveal">Усан эргэлтэт болон хийн цохилтот технологийг тухайн хөрсний онцлогт тохируулан хослуулна. Зүүн талын цооног таны уруудах гүнийг харуулна.</p>
+    <div class="methods">
+      <article class="panel method method--primary reveal">
+        <div class="method__head"><h3>Усан эргэлтэт өрөм</h3><span class="pill">Үндсэн технологи</span></div>
+        <p class="method__use">Зориулалт: ямар ч төрлийн хөрсөнд</p>
+        <p class="method__d">Цооногийг бэхэлгээний яндангаас томоор өрөмдөж, доороос дээш голын мөхлөгт хайргыг хийнэ. Цооног нурах, уст үе хаагдах эрсдлээс бүрэн хамгаална.</p>
+        <div class="specs"><div class="spec"><span>Диаметр</span><b>198–500 мм</b></div><div class="spec"><span>Ган яндан</span><b>133–325 мм</b></div><div class="spec"><span>Насжилт</span><b>20+ жил</b></div></div>
+        <ul class="adv"><li>Газарзүй, хөрснөөс үл хамаарна</li><li>Говийн элсэрхэг, шаварлаг хөрсөнд</li><li>Усны хэмжээ багасахаас хамгаална</li><li>Хэрэглээ өндөртэй худагт</li></ul>
+      </article>
+      <article class="panel method reveal" data-d="1">
+        <div class="method__head"><h3>Хийн цохилтот өрөм</h3><span class="pill pill--ghost">Хадархаг хөрс</span></div>
+        <p class="method__use">Зориулалт: чулуурхаг, өндөрлөг газар</p>
+        <p class="method__d">Хатуу, үргэлжилсэн чулуутай хангай газрын чулуулагт өндөр бүтээмжтэй. Бэхэлгээнд ган яндан болон PVC хоолой ашиглана.</p>
+        <ul class="adv"><li>Хадархаг хөрсөнд бүтээмж өндөр</li><li>Уулархаг, хангайн бүсэд</li><li>Зарцуулах цаг, материал бага</li><li>Ажиллах хүчний зардал бага</li></ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- CAPACITY -->
+<section class="section" id="capacity" data-depth="150" data-strata="Уст үе">
+  <div class="wrap">
+    <div class="eyebrow"><span>04</span> Хүчин чадал</div>
+    <h2 class="h-sec reveal">Худгийн боломжит хүчин чадал</h2>
+    <div class="stats">
+      <div class="panel stat reveal"><b><span class="cnt" data-to="50">0</span><i>Л/сек</i></b><span>Усны гарц 0.5–50 Л/сек</span></div>
+      <div class="panel stat reveal" data-d="1"><b><span class="cnt" data-to="250">0</span><i>м</i></b><span>Цооногийн гүн 30–250 м</span></div>
+      <div class="panel stat reveal" data-d="2"><b><span class="cnt" data-to="500">0</span><i>мм</i></b><span>Диаметр 198–500 мм</span></div>
+      <div class="panel stat reveal" data-d="3"><b><span class="cnt" data-to="20">0</span><i>+ жил</i></b><span>Баталгаат насжилт</span></div>
+    </div>
+    <div class="brigades">
+      <div class="panel brig reveal"><b>2</b><span>Усан эргэлтэт өрөмдлөгийн бригад</span></div>
+      <div class="panel brig reveal" data-d="1"><b>1</b><span>Хийн цохилтот өрөмдлөгийн бригад</span></div>
+      <div class="panel brig reveal" data-d="2"><b>1</b><span>Засварын бригад</span></div>
+      <div class="panel brig reveal" data-d="3"><b>3+1</b><span>Нэгэн зэрэг ажиллах чадавх</span></div>
+    </div>
+    <p class="panel note reveal">Нарны эх үүсвэрээр худгийн ашиглалтын цахилгааны хэрэглээг шийдэж өгөх боломжтой — алслагдсан бэлчээр, говийн нөхцөлд ч тасралтгүй усан хангамж.</p>
+  </div>
+</section>
+
+<!-- HISTORY -->
+<section class="section" id="history" data-depth="185" data-strata="Гүн уст үе">
+  <div class="wrap">
+    <div class="eyebrow"><span>05</span> Түүхэн замнал</div>
+    <h2 class="h-sec reveal">Дөрөвний зуун жилийн ундарга</h2>
+    <p class="lead reveal">2001 оноос өнөөг хүртэл нийт 500 гаруй худаг — жил бүр гүнзгийрсэн туршлага.</p>
+    <div class="tl">
+      <div class="tl__row reveal"><div class="tl__yr">2001–2008</div><div class="panel tl__b"><div class="tl__c">95<i>худаг</i></div><p>Ахуйн хэрэглээний зориулалтын худгууд</p></div></div>
+      <div class="tl__row reveal"><div class="tl__yr">2009–2015</div><div class="panel tl__b"><div class="tl__c">42<i>худаг</i></div><p>Үйлдвэрлэл, ахуй, бэлчээрийн зориулалт</p></div></div>
+      <div class="tl__row reveal"><div class="tl__yr">2016–2017</div><div class="panel tl__b"><div class="tl__c">120<i>худаг</i></div><p>Бэлчээр болон ахуйн зориулалт</p></div></div>
+      <div class="tl__row reveal"><div class="tl__yr">2018–2021</div><div class="panel tl__b"><div class="tl__c">127<i>худаг</i></div><p>Газар тариалан, бэлчээр, үйлдвэрлэл, үйлчилгээ</p></div></div>
+      <div class="tl__row reveal"><div class="tl__yr">2022–2023</div><div class="panel tl__b"><div class="tl__c">42<i>худаг</i></div><p>"Тэрбум мод" төсөл, газар тариалан, уул уурхай</p></div></div>
+      <div class="tl__row reveal"><div class="tl__yr">2024–2025</div><div class="panel tl__b"><div class="tl__c">65<i>худаг</i></div><p>Улсын онцгой объектууд (ДЦС), уул уурхай, газар тариалан, "Тэрбум мод" төсөл</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section class="section" id="projects" data-depth="215" data-strata="Чулуун ёроол">
+  <div class="wrap">
+    <div class="eyebrow"><span>06</span> Томоохон ажлууд</div>
+    <h2 class="h-sec reveal">Улсын хэмжээний төслүүд</h2>
+    <div class="proj">
+      <article class="panel pj reveal"><span class="pj__k">A — Үндэсний хөтөлбөр</span><h3>"Тэрбум мод" төсөл</h3><p>Ерөнхийлөгчийн санаачилсан төслийн хүрээнд найман аймагт мод усалгааны худаг, уст цэг.</p><div class="tags"><span>Говьсүмбэр</span><span>Дорноговь</span><span>Дорнод</span><span>Сүхбаатар</span><span>Увс</span><span>Төв</span><span>Сэлэнгэ</span></div></article>
+      <article class="panel pj reveal" data-d="1"><span class="pj__k">B — Уул уурхай</span><h3>Өндөр хүчин чадалт худаг</h3><p>Монголросцветмет, ДЦС-2, Өмнөговь Гурван тэс, Ханбогд зэрэг уурхай болон бэлчээрийн худгууд.</p><div class="tags"><span>Монголросцветмет</span><span>ДЦС-2</span><span>Гурван тэс</span><span>Ханбогд</span></div></article>
+      <article class="panel pj reveal"><span class="pj__k">C — Газар тариалан</span><h3>Усжуулалтын худгууд</h3><p>Сэлэнгэ, Төв, Дархан-Уул, Говьсүмбэр, Дорноговь, Дундговь аймгуудад усжуулалт.</p><div class="tags"><span>Сэлэнгэ</span><span>Дархан-Уул</span><span>Төв</span><span>Дундговь</span></div></article>
+      <article class="panel pj reveal" data-d="1"><span class="pj__k">D — Төрийн захиалга</span><h3>БОАЖЯ ба ХХААХҮЯ</h3><p>Халх гол сумын бүтээн байгуулалт, бэлчээр усжуулалт. Чойбалсан хотын усны нөөцийн судалгаа.</p><div class="tags"><span>Халх гол</span><span>Чойбалсан</span><span>Усны нөөц</span></div></article>
+      <article class="panel pj reveal"><span class="pj__k">E — Хил, гааль</span><h3>Боомтуудын усан хангамж</h3><p>Гаалийн Ерөнхий газар, МТЗ-ын захиалгаар боомт, суурингуудын усан хангамж.</p><div class="tags"><span>Замын-Үүд</span><span>Шивээхүрэн</span><span>Цагаан хад</span><span>Бичигт</span></div></article>
+      <article class="panel pj reveal" data-d="1"><span class="pj__k">F — Хувийн хэвшил</span><h3>Аж ахуйн нэгжийн худаг</h3><p>Уул уурхай, үйлдвэрлэл, газар тариалангийн өндөр зарцуулалтын гүн өрмийн худгууд.</p><div class="tags"><span>Уул уурхай</span><span>Үйлдвэрлэл</span><span>Газар тариалан</span></div></article>
+    </div>
+    <div class="panel aimags reveal"><span class="aimags__h">Үйл ажиллагаа явуулсан аймгууд</span><div class="aimags__l"><span>Говьсүмбэр</span><span>Дорноговь</span><span>Дорнод</span><span>Дундговь</span><span>Сүхбаатар</span><span>Увс</span><span>Төв</span><span>Сэлэнгэ</span><span>Дархан-Уул</span><span>Өмнөговь</span></div></div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section class="section" id="team" data-depth="235" data-strata="Усны давхарга">
+  <div class="wrap">
+    <div class="eyebrow"><span>07</span> Баг хамт олон</div>
+    <h2 class="h-sec reveal">Туршлагатай инженер, мастеруудын баг</h2>
+    <div class="team">
+      <div class="team__col reveal">
+        <h3 class="team__h">Удирдлага</h3>
+        <div class="panel person"><img src="assets/nyamdash.jpg" alt="Ц.Нямдаш" loading="lazy"><div><b>Ц.Нямдаш</b><span>Үүсгэн байгуулагч</span></div></div>
+        <div class="panel person"><img src="assets/ganaa.jpg" alt="Н.Ганаа" loading="lazy"><div><b>Н.Ганаа</b><span>Ерөнхий захирал · Өрмийн инженер</span></div></div>
+        <div class="panel person"><img src="assets/amarbayar.jpg" alt="М.Амарбаяр" loading="lazy"><div><b>М.Амарбаяр</b><span>Ерөнхий инженер · Зөвлөх инженер</span></div></div>
+        <div class="panel person"><img src="assets/alibek.jpg" alt="Х.Алибек" loading="lazy"><div><b>Х.Алибек</b><span>Өрмийн мастер · Бригадын дарга</span></div></div>
+      </div>
+      <div class="team__col reveal" data-d="1">
+        <h3 class="team__h">Үндсэн бүрэлдэхүүн</h3>
+        <div class="panel person"><img src="assets/shinebayar.jpg" alt="Н.Шинэбаяр" loading="lazy"><div><b>Н.Шинэбаяр</b><span>Инженер геологич · Гидрогеологич</span></div></div>
+        <div class="panel person"><img src="assets/chantsalnyam.jpg" alt="Ж.Чанцалням" loading="lazy"><div><b>Ж.Чанцалням</b><span>ХАБЭА инженер · Нефтийн инженер</span></div></div>
+        <div class="panel person"><img src="assets/dorjpagma.jpg" alt="Ж.Доржпагма" loading="lazy"><div><b>Ж.Доржпагма</b><span>Ахлах нягтлан бодогч</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="section contact" id="contact" data-depth="250" data-strata="Цэвэр ус">
+  <div class="wrap">
+    <div class="contact__grid">
+      <div class="reveal">
+        <div class="eyebrow"><span>08</span> Холбоо барих</div>
+        <h2 class="h-sec">Хамтран ажиллахдаа<br><span class="accent">баяртай байна</span></h2>
+        <p class="lead">Таны бэлчээр, тариалан, үйлдвэр, уурхайн усан хангамжийн хэрэгцээг ярилцъя. Утсаар холбогдвол урьдчилсан зөвлөгөө өгнө.</p>
+        <div class="phones">
+          <a class="phone" href="tel:99091895">9909-1895</a>
+          <a class="phone" href="tel:88083728">8808-3728</a>
+          <a class="phone" href="tel:99078349">9907-8349</a>
+        </div>
+      </div>
+      <div class="panel cinfo reveal" data-d="1">
+        <div class="cinfo__item"><span class="cinfo__k">Хаяг</span><span class="cinfo__v">Улаанбаатар, Баянзүрх дүүрэг, 6-р хороо, 13-р хороолол, Орчлон комплекс хотхон</span></div>
+        <div class="cinfo__item"><span class="cinfo__k">Байгууллага</span><span class="cinfo__v">Ус Ундрах ХХК · 2001 оноос</span></div>
+        <div class="cinfo__item"><span class="cinfo__k">Үйлчилгээ</span><span class="cinfo__v">Усны хайгуул · Гүний өрөмдлөг · Усны барилга байгууламж</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="ft">
+  <div class="wrap ft__in">
+    <span class="ft__brand">Ус Ундрах ХХК</span>
+    <small>© 2026 · Газрын гүнээс амьд ус ундраана · 9909-1895</small>
+  </div>
+</footer>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>

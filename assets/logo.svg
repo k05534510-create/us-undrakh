@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 340" width="300" height="340">
+  <defs>
+    <radialGradient id="goldRing" cx="50%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#F5D97A"/><stop offset="40%" stop-color="#C9A227"/>
+      <stop offset="75%" stop-color="#A07818"/><stop offset="100%" stop-color="#D4A830"/>
+    </radialGradient>
+    <linearGradient id="dropGrad" x1="25%" y1="10%" x2="75%" y2="100%">
+      <stop offset="0%" stop-color="#A8DFF5"/><stop offset="35%" stop-color="#4AAFE0"/><stop offset="100%" stop-color="#1A6FA8"/>
+    </linearGradient>
+    <radialGradient id="dotGrad" cx="38%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="#A8DFF5"/><stop offset="50%" stop-color="#4AAFE0"/><stop offset="100%" stop-color="#1A6FA8"/>
+    </radialGradient>
+    <radialGradient id="dropShine" cx="35%" cy="25%" r="40%">
+      <stop offset="0%" stop-color="white" stop-opacity="0.85"/><stop offset="100%" stop-color="white" stop-opacity="0"/>
+    </radialGradient>
+    <path id="drop" d="M0,-26 C0,-26 -17,0 -17,14 C-17,23.5 -9.5,31 0,31 C9.5,31 17,23.5 17,14 C17,0 0,-26 0,-26 Z"/>
+  </defs>
+  <g transform="translate(150,52)"><use href="#drop" fill="url(#dropGrad)"/><use href="#drop" fill="url(#dropShine)"/></g>
+  <g transform="translate(208.9,86) rotate(60)"><use href="#drop" fill="url(#dropGrad)"/><use href="#drop" fill="url(#dropShine)"/></g>
+  <g transform="translate(208.9,154) rotate(120)"><use href="#drop" fill="url(#dropGrad)"/><use href="#drop" fill="url(#dropShine)"/></g>
+  <g transform="translate(150,188) rotate(180)"><use href="#drop" fill="url(#dropGrad)"/><use href="#drop" fill="url(#dropShine)"/></g>
+  <g transform="translate(91.1,154) rotate(240)"><use href="#drop" fill="url(#dropGrad)"/><use href="#drop" fill="url(#dropShine)"/></g>
+  <g transform="translate(91.1,86) rotate(300)"><use href="#drop" fill="url(#dropGrad)"/><use href="#drop" fill="url(#dropShine)"/></g>
+  <circle cx="150" cy="120" r="21" fill="none" stroke="url(#goldRing)" stroke-width="5"/>
+  <circle cx="150" cy="120" r="16" fill="url(#dotGrad)"/>
+  <ellipse cx="144" cy="113" rx="6" ry="7" fill="white" opacity="0.5" transform="rotate(-15,144,113)"/>
+  <ellipse cx="147" cy="110" rx="3" ry="4" fill="white" opacity="0.35"/>
+  <line x1="55" y1="238" x2="245" y2="238" stroke="#4AAFE0" stroke-width="1.2" opacity="0.45"/>
+  <text x="150" y="278" text-anchor="middle" font-family="'Arial Black',Arial,sans-serif" font-weight="900" font-size="36" letter-spacing="2" fill="#4AAFE0">УС УНДРАХ</text>
+  <text x="150" y="314" text-anchor="middle" font-family="'Arial Black',Arial,sans-serif" font-weight="900" font-size="20" letter-spacing="6" fill="#C9A227">ХХК</text>
+</svg>
